@@ -8,6 +8,8 @@
   pkg-config,
   btrfs-progs,
   gpgme,
+  xen,
+  yajl,
   nix-update-script,
 }:
 
@@ -33,6 +35,8 @@ buildGoModule rec {
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     btrfs-progs
+    xen
+    yajl
   ];
 
   vendorHash = "sha256-TQ5ylR0N2TWn1dv1qMcGFLYMPEK+/sGtQ/0LiZF95S4=";
@@ -40,7 +44,20 @@ buildGoModule rec {
   ldflags = [
     "-s"
     "-w"
+    "-X kraftkit.sh/internal/cli/kraft.sentryDsn="
+    "-X kraftkit.sh/internal/version.buildTime=1970-01-01T00:00:00Z"
+    "-X kraftkit.sh/internal/version.commit=nixpkgs"
     "-X kraftkit.sh/internal/version.version=${version}"
+  ];
+
+  tags = [
+    "containers_image_storage_stub"
+    "containers_image_openpgp"
+    "netgo"
+    "osusergo"
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    "xen"
   ];
 
   subPackages = [
